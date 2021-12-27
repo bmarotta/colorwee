@@ -300,7 +300,11 @@ export class Color {
             this.r.toString(16).padStart(2, "0") +
             this.g.toString(16).padStart(2, "0") +
             this.b.toString(16).padStart(2, "0") +
-            (this.a < 1 ? (this.a * 255).toString(16).padStart(2, "0") : "")
+            (this.a < 1
+                ? Math.max(Math.round(this.a * 255), 0)
+                      .toString(16)
+                      .padStart(2, "0")
+                : "")
         );
     }
     private parseHex(value: string) {
