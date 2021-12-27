@@ -345,6 +345,16 @@ export class Color {
         }
     }
 
+    /**
+     * Make sure that the values are in the right range
+     */
+    sanitize() {
+        this.r = Math.min(255, Math.max(0, Math.round(this.r)));
+        this.g = Math.min(255, Math.max(0, Math.round(this.g)));
+        this.b = Math.min(255, Math.max(0, Math.round(this.b)));
+        this.a = Math.min(1, Math.max(0, this.a));
+    }
+
     static Validator = {
         /**
          * Check a hexa color (without #)
