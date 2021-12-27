@@ -1,0 +1,41 @@
+{
+  "name": "mini-color",
+  "version": "0.1.0",
+  "description": "A mini package for color conversion not bloated with functions you will never use",
+  "main": "./dist/index.js",
+  "scripts": {
+    "clean": "rimraf dist",
+    "test": "jest --config jest.config.js --collect-coverage",
+    "test-watch": "jest --config jest.config.js --collect-coverage --watch",
+    "build": "npm run clean && rollup -c rollup.config.js",
+    "build:es": "npm run clean && rollup -c rollup.config.es.js",
+    "watch": "rollup -w -c rollup.config.js",
+    "watch:es": "rollup -w -c rollup.config.es.js",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "lint": "npm run format && eslint . --ext .ts --fix"
+  },
+  "devDependencies": {
+    "@types/jest": "latest",
+    "@types/node": "latest",
+    "@typescript-eslint/eslint-plugin": "latest",
+    "@typescript-eslint/parser": "latest",
+    "eslint": "latest",
+    "eslint-config-prettier": "latest",
+    "jest": "latest",
+    "jest-junit": "latest",
+    "prettier": "latest",
+    "rollup": "latest",
+    "rollup-plugin-typescript2": "latest",
+    "ts-jest": "latest",
+    "typescript": "latest"
+  },
+  "keywords": [
+    "color",
+    "colour",
+    "css",
+    "conversion",
+    "manipulation"
+  ],
+  "author": "Bruno Marotta",
+  "license": "ISC"
+}
