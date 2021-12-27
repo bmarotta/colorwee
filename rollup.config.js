@@ -5,9 +5,9 @@ export default [{
   input: 'src/color.ts',
   output: [
     {
-      file: "dist/index.js",
+      file: "dist/color.js",
       format: 'cjs',
-      name: "mini-color"  
+      name: "colorwee"  
     },
   ],
   //preserveModules: true, // Uncomment to split in separate files

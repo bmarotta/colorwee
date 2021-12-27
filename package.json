@@ -1,8 +1,9 @@
 {
-  "name": "mini-color",
+  "name": "colorwee",
   "version": "0.1.0",
   "description": "A mini package for color conversion not bloated with functions you will never use",
-  "main": "./dist/index.js",
+  "main": "./dist/color.js",
+  "types": "./dist/color.d.ts",
   "scripts": {
     "clean": "rimraf dist",
     "test": "jest --config jest.config.js --collect-coverage",
@@ -37,5 +38,9 @@
     "manipulation"
   ],
   "author": "Bruno Marotta",
-  "license": "ISC"
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bmarotta/mini-color.git"
+  }
 }

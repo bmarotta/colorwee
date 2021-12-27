@@ -5,9 +5,9 @@ export default [{
   input: 'src/color.ts',
   output: [
     {
-      file: "dist/index.es.js",
+      file: "dist/color.es.js",
       format: "es",
-      name: "mini-color" 
+      name: "colorwee" 
     },
   ],
   external: [
