@@ -60,6 +60,10 @@ export class Color {
         }
     }
 
+    /**
+     * Returns the color as a HEX string
+     * @returns Color in HEX format
+     */
     toString() {
         // Default string is hex string
         return this.tohexString();
@@ -105,9 +109,6 @@ export class Color {
     get alpha(): number {
         return this.a;
     }
-    /**
-     * The alpha (transparency) as a number from 0 to 1
-     */
     set alpha(value: number) {
         // Make sure we have a number. If not default to 0
         if (value === undefined || typeof value !== "number" || isNaN(value)) {
@@ -229,6 +230,10 @@ export class Color {
     toHsla(): Hsla {
         return { a: this.a, ...Color.Convertor.rgbToHsl(<Rgb>(<unknown>this)) };
     }
+    /**
+     * Reads and convert the Hsla structure
+     * @param value The input Hsla structzure
+     */
     fromHsla(value: Hsla) {
         this.rgb = Color.Convertor.hslToRgb(value);
     }
@@ -268,6 +273,14 @@ export class Color {
         }
     }
 
+    /**
+     * Creates a new color object based on th Hsla structure
+     * @param h Hue (from 0 to 360) or Hsl or Hsla structure
+     * @param s Saturation (from 0 to 100)
+     * @param l Lightness (from 0 to 100)
+     * @param a Alpha (from 0 to 1)
+     * @returns A new instance of the Color object
+     */
     static newHslColor(h: HSL | Hsla | number, s?: number, l?: number, a?: number): Color {
         const paramAsNumbers = typeof h == "number";
         const hsl = paramAsNumbers ? { h: h, s: s ?? 0, l: l ?? 0 } : h;
@@ -277,6 +290,10 @@ export class Color {
 
     /* HEX Functions */
 
+    /**
+     * Returns the color as an Hex string (e.g. #FFFFFF)
+     * @returns An Hex string
+     */
     tohexString(): string {
         return (
             "#" +
@@ -305,6 +322,10 @@ export class Color {
         }
     }
 
+    /**
+     * Reads the value from an CSS color string
+     * @param str String to parse. Accepted formats are Hex, Rgb or Hsl
+     */
     parse(str: string) {
         if (typeof str == "undefined" || (str = str.trim().toLowerCase()).length == 0) {
             throw new Error("Cannot parse an empty string");
@@ -416,6 +437,13 @@ export class Color {
             return { r: r, g: g, b: b };
         },
 
+        /**
+         * Parses a string in numeric or percentage format
+         * @param value Value to parse
+         * @param range The maximum range value for the percentage (e.g.: 255, 360 or 100)
+         * @param isInt When true, rounds the value to an integer
+         * @returns The parsed value as a number
+         */
         numberOrPercentage(value: string, range: number, isInt: boolean): number {
             const isPercentage = value.endsWith("%");
             let res = isInt && !isPercentage ? parseInt(value) : parseFloat(value);
@@ -429,21 +457,36 @@ export class Color {
         }
     };
 
-    clone() {
+    /**
+     * Copies the values into a new Color object
+     * @returns A new Color object
+     */
+    clone(): Color {
         return new Color(this.r, this.g, this.b, this.a);
     }
 
+    /**
+     * Returns a string uniquely identifying the color
+     * @returns A string uniquely identifying the color (currently rgba)
+     */
     getHashCode(): string {
         return this.toRgbaString();
     }
 
-    // https://stackoverflow.com/questions/9018016/how-to-compare-two-colors-for-similarity-difference
-    static colorDistance(e1: Rgb, e2: Rgb, normalize = false): number {
-        const rmean = (e1.r + e2.r) / 2;
-        const r = e1.r - e2.r;
-        const g = e1.g - e2.g;
-        const b = e1.b - e2.b;
+    // Source: https://stackoverflow.com/questions/9018016/how-to-compare-two-colors-for-similarity-difference
+    /**
+     * Compares 2 colors and returns a value indicating the distance between them
+     * @param c1 The first color to compare
+     * @param c2 The second color to compare
+     * @param normalize When true returns a value between 0 and 1
+     * @returns A value indicating the distance between 2 colors
+     */
+    static colorDistance(c1: Rgb, c2: Rgb, normalize = false): number {
+        const rmean = (c1.r + c2.r) / 2;
+        const r = c1.r - c2.r;
+        const g = c1.g - c2.g;
+        const b = c1.b - c2.b;
         const res = Math.sqrt((((512 + rmean) * r * r) >> 8) + 4 * g * g + (((767 - rmean) * b * b) >> 8));
         return normalize ? res / 764.8333151739665 : res;
     }
-} // END class
+}
