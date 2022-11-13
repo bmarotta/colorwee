@@ -43,7 +43,7 @@ Full documentation here: https://bmarotta.github.io/colorwee/classes/Color.html
 ## Motivation
 
 When developing my last website https://www.ohmydots.com , I was very paranoid about size and performance.
-Most of the color conversion libraries are all purpose and have a bunch of function you will never use.
+Most of the color conversion libraries are all purpose and have a bunch of functions you will never use.
 I then tried to most referred gist: https://gist.github.com/neolitec/1344610/3a3a9dc7d94644ff48f12cc7823b79f2b8ea17ac
 Unfortunately it has (again) a lot of functions, some bugs and it keeps converting everything all the time.
 Colorwee has a minimal set of functions, stores the data in RGB (from 0 to 255) and converts only when needed.
