@@ -1,6 +1,6 @@
 {
   "name": "colorwee",
-  "version": "0.1.12",
+  "version": "0.1.14",
   "description": "A mini package for color conversion not bloated with functions you will never use",
   "main": "./dist/color.js",
   "types": "./dist/color.d.ts",
@@ -8,7 +8,8 @@
     "clean": "rimraf dist",
     "test": "jest --config jest.config.js --collect-coverage",
     "test-watch": "jest --config jest.config.js --collect-coverage --watch",
-    "build": "npm run clean && rollup -c rollup.config.js",
+    "build": "npm run clean && rollup -c rollup.config.js && rollup -c rollup.config.es.js",
+    "build:cjs": "npm run clean && rollup -c rollup.config.js",
     "build:es": "npm run clean && rollup -c rollup.config.es.js",
     "watch": "rollup -w -c rollup.config.js",
     "watch:es": "rollup -w -c rollup.config.es.js",
