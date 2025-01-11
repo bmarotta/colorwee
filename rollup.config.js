@@ -8,26 +8,7 @@ export default [
         input: "src/color.ts",
         output: [
             {
-                file: "dist/color.js",
-                format: "cjs",
-                name: "colorwee",
-                banner: ""
-            },
-            {
                 file: "dist/color.es.js",
-                format: "es",
-                name: "colorwee",
-                banner: ""
-            },
-            {
-                file: "dist/color.min.js",
-                format: "cjs",
-                name: "colorwee",
-                banner: "",
-                plugins: [terser()]
-            },
-            {
-                file: "dist/color.es.min.js",
                 format: "es",
                 name: "colorwee",
                 banner: "",
