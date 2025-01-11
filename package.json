@@ -26,7 +26,7 @@
     "jest": "latest",
     "jest-junit": "latest",
     "prettier": "latest",
-    "rollup": "latest",
+    "rollup": "^4.30.1",
     "rollup-plugin-typescript2": "latest",
     "ts-jest": "latest",
     "typescript": "latest"
