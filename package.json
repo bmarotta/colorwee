@@ -1,10 +1,10 @@
 {
   "name": "colorwee",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A mini package for color conversion not bloated with functions you will never use",
-  "main": "./dist/color.min.js",
+  "main": "./dist/color.js",
   "types": "./dist/color.d.ts",
-  "module": "./dist/color.es.min.js",
+  "module": "./dist/color.es.js",
   "type": "module",
   "scripts": {
     "clean": "rimraf dist",

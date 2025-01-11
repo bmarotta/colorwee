@@ -1,6 +1,6 @@
 # colorwee
 
-A wee package for handling the most used color manipulation functions (RGB, HSL and HEX). Not bloated with functions and formats you don't need or that are too trivial to implement. On top it is written in typescript and has full test coverage.
+A wee package for handling the most used color manipulation functions (RGB, HSL and HEX). Not bloated with functions and formats you don't need or that are too trivial to implement. On top it is written in typescript and has full test coverage. **Only 6KB minified code.**
 
 ## Installation
 
