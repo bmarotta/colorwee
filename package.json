@@ -2,23 +2,22 @@
   "name": "colorwee",
   "version": "0.1.15",
   "description": "A mini package for color conversion not bloated with functions you will never use",
-  "main": "./dist/color.js",
+  "main": "./dist/color.min.js",
   "types": "./dist/color.d.ts",
-  "module": "./dist/color.es.js",
+  "module": "./dist/color.es.min.js",
   "type": "module",
   "scripts": {
     "clean": "rimraf dist",
     "test": "jest --config jest.config.js --collect-coverage",
     "test-watch": "jest --config jest.config.js --collect-coverage --watch",
-    "build": "npm run clean && rollup -c rollup.config.js && rollup -c rollup.config.es.js",
-    "build:cjs": "npm run clean && rollup -c rollup.config.js",
-    "build:es": "npm run clean && rollup -c rollup.config.es.js",
+    "build": "npm run clean && rollup -c rollup.config.js",
     "watch": "rollup -w -c rollup.config.js",
     "watch:es": "rollup -w -c rollup.config.es.js",
     "format": "prettier --write \"src/**/*.ts\"",
     "lint": "npm run format && eslint . --ext .ts --fix"
   },
   "devDependencies": {
+    "@rollup/plugin-terser": "^0.4.4",
     "@rollup/plugin-typescript": "^12.1.2",
     "@types/jest": "latest",
     "@types/node": "latest",
@@ -30,6 +29,7 @@
     "jest-junit": "latest",
     "prettier": "latest",
     "rollup": "^4.30.1",
+    "rollup-plugin-cleanup": "^3.2.1",
     "ts-jest": "latest",
     "typescript": "latest"
   },
@@ -52,7 +52,9 @@
     "blue",
     "hue",
     "saturation",
-    "lightness"
+    "lightness",
+    "color-distance",
+    "color-conversion"
   ],
   "author": "Bruno Marotta",
   "license": "MIT",
