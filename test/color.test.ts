@@ -91,6 +91,18 @@ describe("color", () => {
         expect(c.blue).toBe(128);
         expect(c.alpha).toBe(0.5);
 
+        c = new Color("hsla(0, 0%, 50%,0)");
+        expect(c.red).toBe(128);
+        expect(c.green).toBe(128);
+        expect(c.blue).toBe(128);
+        expect(c.alpha).toBe(0);
+
+        c = new Color("hsla(0, 0%, 50%,1)");
+        expect(c.red).toBe(128);
+        expect(c.green).toBe(128);
+        expect(c.blue).toBe(128);
+        expect(c.alpha).toBe(1);
+
         c = new Color("hsl(83.3333%, 100%, 25%)");
         expect(c.red).toBe(128);
         expect(c.green).toBe(0);

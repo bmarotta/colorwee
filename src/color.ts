@@ -24,7 +24,7 @@ export interface Rgba extends Rgb {
     a: number;
 }
 
-const HSLA_REGEX = /^hsla?\(\s*(\d{1,3}(?:\.\d+)?%?)\s*,\s*(\d{1,3}(?:\.\d+)?%)\s*,\s*(\d{1,3}(?:\.\d+)?%)(?:,\s*(0?\.\d+%?))?\)$/;
+const HSLA_REGEX = /^hsla?\(\s*(\d{1,3}(?:\.\d+)?%?)\s*,\s*(\d{1,3}(?:\.\d+)?%)\s*,\s*(\d{1,3}(?:\.\d+)?%)(?:,\s*(0?\.?\d+%?))?\)$/;
 const RGBA_REGEX = /^rgba?\((\d{1,3}(?:\.\d+)?%?),\s*(\d{1,3}(?:\.\d+)?%?),\s*(\d{1,3}(?:\.\d+)?%?)(?:,\s*(0?\.?\d+%?))?\)$/;
 export class Color {
     /**
