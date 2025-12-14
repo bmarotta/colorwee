@@ -12,14 +12,16 @@ export default [
                 format: "cjs",
                 name: "colorwee",
                 banner: "",
-                plugins: [terser()]
+                plugins: [terser()],
+                sourcemap: true
             },
             {
                 file: "dist/color.es.js",
                 format: "es",
                 name: "colorwee",
                 banner: "",
-                plugins: [terser()]
+                plugins: [terser()],
+                sourcemap: true
             }
         ],
         //preserveModules: true, // Uncomment to split in separate files
