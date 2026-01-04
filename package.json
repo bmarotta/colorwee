@@ -1,18 +1,22 @@
 {
   "name": "colorwee",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "A mini package for color conversion not bloated with functions you will never use",
   "main": "./dist/color.js",
   "types": "./dist/color.d.ts",
   "module": "./dist/color.es.js",
-  "type": "module",
+  "type": "commonjs",
+  "exports": {
+    "import": "./dist/color.es.js",
+    "require": "./dist/color.js"
+  },
   "scripts": {
     "clean": "rimraf dist",
     "test": "jest --config jest.config.js --collect-coverage",
     "test-watch": "jest --config jest.config.js --collect-coverage --watch",
-    "build": "npm run clean && rollup -c rollup.config.js",
-    "watch": "rollup -w -c rollup.config.js",
-    "watch:es": "rollup -w -c rollup.config.es.js",
+    "build": "npm run clean && rollup -c rollup.config.js --bundleConfigAsCjs",
+    "watch": "rollup -w -c rollup.config.js --bundleConfigAsCjs",
+    "watch:es": "rollup -w -c rollup.config.es.js --bundleConfigAsCjs",
     "format": "prettier --write \"src/**/*.ts\"",
     "lint": "npm run format && eslint . --ext .ts --fix"
   },
@@ -61,5 +65,9 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/bmarotta/colorwee.git"
-  }
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false
 }

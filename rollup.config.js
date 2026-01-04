@@ -11,7 +11,7 @@ export default [
                 file: "dist/color.js",
                 format: "cjs",
                 name: "colorwee",
-                banner: "",
+                banner: `/*!\n * ${pkg.name} v${pkg.version}\n * (c) ${new Date().getFullYear()} ${pkg.author}\n * Released under the ${pkg.license} License.\n */`,
                 plugins: [terser()],
                 sourcemap: true
             },
@@ -19,7 +19,7 @@ export default [
                 file: "dist/color.es.js",
                 format: "es",
                 name: "colorwee",
-                banner: "",
+                banner: `/*!\n * ${pkg.name} v${pkg.version}\n * (c) ${new Date().getFullYear()} ${pkg.author}\n * Released under the ${pkg.license} License.\n */`,
                 plugins: [terser()],
                 sourcemap: true
             }
