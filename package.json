@@ -5,7 +5,6 @@
   "main": "./dist/color.js",
   "types": "./dist/color.d.ts",
   "module": "./dist/color.es.js",
-  "type": "commonjs",
   "exports": {
     "import": "./dist/color.es.js",
     "require": "./dist/color.js"
