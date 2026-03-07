@@ -69,7 +69,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/bmarotta/colorwee.git"
+    "url": "git+https://github.com/bmarotta/colorwee.git"
   },
   "files": [
     "dist"
