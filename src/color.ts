@@ -509,7 +509,14 @@ export class Color {
  * @returns A value indicating the distance between 2 colors
  */
 export function colorDistance(c1: Rgb, c2: Rgb, normalize = false): number {
-    return distance(c1.r, c1.g, c1.b, c2.r, c2.g, c2.b, normalize);
+    // The formula is repeated in colorDistanceAt on purpose, for performance (no extra call in per-pixel loops).
+    // Keep both in sync; the tests check they return identical results.
+    const rmean = (c1.r + c2.r) / 2;
+    const r = c1.r - c2.r;
+    const g = c1.g - c2.g;
+    const b = c1.b - c2.b;
+    const res = Math.sqrt((((512 + rmean) * r * r) >> 8) + 4 * g * g + (((767 - rmean) * b * b) >> 8));
+    return normalize ? res / 764.8333151739665 : res;
 }
 
 /**
@@ -522,14 +529,13 @@ export function colorDistance(c1: Rgb, c2: Rgb, normalize = false): number {
  * @returns A value indicating the distance between the pixel and the color
  */
 export function colorDistanceAt(data: ArrayLike<number>, index: number, color: Rgb, normalize = false): number {
-    return distance(data[index], data[index + 1], data[index + 2], color.r, color.g, color.b, normalize);
-}
-
-function distance(r1: number, g1: number, b1: number, r2: number, g2: number, b2: number, normalize: boolean): number {
-    const rmean = (r1 + r2) / 2;
-    const r = r1 - r2;
-    const g = g1 - g2;
-    const b = b1 - b2;
+    // Repeats the colorDistance formula on purpose, for performance (no extra call in per-pixel loops).
+    // Keep both in sync; the tests check they return identical results.
+    const r1 = data[index];
+    const rmean = (r1 + color.r) / 2;
+    const r = r1 - color.r;
+    const g = data[index + 1] - color.g;
+    const b = data[index + 2] - color.b;
     const res = Math.sqrt((((512 + rmean) * r * r) >> 8) + 4 * g * g + (((767 - rmean) * b * b) >> 8));
     return normalize ? res / 764.8333151739665 : res;
 }
