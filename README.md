@@ -11,7 +11,7 @@ npm install colorwee
 ## Usage
 
 ```typescript
-import { Color, colorDistance, colorDistanceAt, colorDistanceSquaredAt } from "colorwee";
+import { Color, colorDistance, colorDistanceAt, colorDistanceSquared, colorDistanceSquaredAt } from "colorwee";
 
 // Instantiate
 const c1 = new Color("#ffffff");
@@ -43,6 +43,8 @@ const pixelSimilarity = colorDistanceAt(imageData.data, pixel * 4, { r: 250, g: 
 
 // Faster for thresholds: the squared distance skips the square root. Compare it with the threshold squared
 const isSimilar = colorDistanceSquaredAt(imageData.data, pixel * 4, { r: 250, g: 255, b: 255 }, true) <= 0.05 * 0.05;
+const isSimilarRgb = colorDistanceSquared({ r: 255, g: 255, b: 255 }, { r: 250, g: 255, b: 255 }, true) <= 0.05 * 0.05;
+// MAX_COLOR_DISTANCE (black to white) and MAX_COLOR_DISTANCE_SQUARED are exported to convert between raw and normalized values
 ```
 
 Full documentation here: https://bmarotta.github.io/colorwee/classes/Color.html

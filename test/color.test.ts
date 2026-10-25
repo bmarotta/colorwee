@@ -1,4 +1,12 @@
-import { Color, colorDistance, colorDistanceAt, colorDistanceSquaredAt } from "../src/color";
+import {
+    Color,
+    colorDistance,
+    colorDistanceAt,
+    colorDistanceSquared,
+    colorDistanceSquaredAt,
+    MAX_COLOR_DISTANCE,
+    MAX_COLOR_DISTANCE_SQUARED
+} from "../src/color";
 
 describe("color", () => {
     test("can create an empty color", async () => {
@@ -242,7 +250,7 @@ describe("color", () => {
         expect(Color.colorDistance(c1, c2)).toBe(colorDistance(c1, c2));
         expect(Color.colorDistance(c1, c2, true)).toBe(colorDistance(c1, c2, true));
     });
-    test("colorDistanceSquaredAt is the square of colorDistanceAt", async () => {
+    test("colorDistanceSquared(At) is the square of colorDistance(At)", async () => {
         const colors = [
             { r: 0, g: 0, b: 0 },
             { r: 255, g: 255, b: 255 },
@@ -261,6 +269,8 @@ describe("color", () => {
             for (const c2 of colors) {
                 expect(Math.sqrt(colorDistanceSquaredAt(data, 4, c2))).toBe(colorDistanceAt(data, 4, c2));
                 expect(colorDistanceSquaredAt(data, 4, c2, true)).toBeCloseTo(colorDistanceAt(data, 4, c2, true) ** 2, 12);
+                expect(colorDistanceSquared(c1, c2)).toBe(colorDistanceSquaredAt(data, 4, c2));
+                expect(colorDistanceSquared(c1, c2, true)).toBe(colorDistanceSquaredAt(data, 4, c2, true));
             }
         }
         expect(colorDistanceSquaredAt(new Uint8ClampedArray([0, 0, 0, 255]), 0, { r: 255, g: 255, b: 255 }, true)).toBe(1);
@@ -275,5 +285,12 @@ describe("color", () => {
                 expect(colorDistanceSquaredAt(data, 0, color) <= threshold * threshold).toBe(colorDistanceAt(data, 0, color) <= threshold);
             }
         }
+    });
+    test("max distance constants match black and white", async () => {
+        const black = { r: 0, g: 0, b: 0 };
+        const white = { r: 255, g: 255, b: 255 };
+        expect(colorDistance(black, white)).toBe(MAX_COLOR_DISTANCE);
+        expect(colorDistanceSquared(black, white)).toBe(MAX_COLOR_DISTANCE_SQUARED);
+        expect(MAX_COLOR_DISTANCE * MAX_COLOR_DISTANCE).toBe(MAX_COLOR_DISTANCE_SQUARED);
     });
 });
