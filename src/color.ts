@@ -496,10 +496,27 @@ export class Color {
      * @returns A value indicating the distance between 2 colors
      */
     static colorDistance(c1: Rgb, c2: Rgb, normalize = false): number {
-        const rmean = (c1.r + c2.r) / 2;
-        const r = c1.r - c2.r;
-        const g = c1.g - c2.g;
-        const b = c1.b - c2.b;
+        return Color.distance(c1.r, c1.g, c1.b, c2.r, c2.g, c2.b, normalize);
+    }
+
+    /**
+     * Compares the pixel starting at `index` in an RGBA buffer with a color, without allocating.
+     * Returns exactly the same value as colorDistance. The alpha channel is ignored
+     * @param data An RGBA pixel buffer (e.g. ImageData.data)
+     * @param index The index of the pixel's red channel (pixel number × 4)
+     * @param color The color to compare with
+     * @param normalize When true returns a value between 0 and 1
+     * @returns A value indicating the distance between the pixel and the color
+     */
+    static colorDistanceAt(data: ArrayLike<number>, index: number, color: Rgb, normalize = false): number {
+        return Color.distance(data[index], data[index + 1], data[index + 2], color.r, color.g, color.b, normalize);
+    }
+
+    private static distance(r1: number, g1: number, b1: number, r2: number, g2: number, b2: number, normalize: boolean): number {
+        const rmean = (r1 + r2) / 2;
+        const r = r1 - r2;
+        const g = g1 - g2;
+        const b = b1 - b2;
         const res = Math.sqrt((((512 + rmean) * r * r) >> 8) + 4 * g * g + (((767 - rmean) * b * b) >> 8));
         return normalize ? res / 764.8333151739665 : res;
     }

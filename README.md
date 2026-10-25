@@ -36,6 +36,10 @@ const anotherHSl = Color.Convertor.rgbToHsl({ r: 15, g: 15, b: 240 });
 // 0 is equal
 // 1 is black and white
 const similiarity = Color.colorDistance({ r: 255, g: 255, b: 255 }, { r: 250, g: 255, b: 255 }, true);
+
+// Same distance, read straight from an RGBA pixel buffer (e.g. ImageData.data) without allocating.
+// The index is the pixel's red channel (pixel number * 4); alpha is ignored
+const pixelSimilarity = Color.colorDistanceAt(imageData.data, pixel * 4, { r: 250, g: 255, b: 255 }, true);
 ```
 
 Full documentation here: https://bmarotta.github.io/colorwee/classes/Color.html
