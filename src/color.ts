@@ -487,37 +487,49 @@ export class Color {
         return this.toRgbaString();
     }
 
-    // Source: https://stackoverflow.com/questions/9018016/how-to-compare-two-colors-for-similarity-difference
     /**
      * Compares 2 colors and returns a value indicating the distance between them
+     * @deprecated Use the exported colorDistance function instead
      * @param c1 The first color to compare
      * @param c2 The second color to compare
      * @param normalize When true returns a value between 0 and 1
      * @returns A value indicating the distance between 2 colors
      */
     static colorDistance(c1: Rgb, c2: Rgb, normalize = false): number {
-        return Color.distance(c1.r, c1.g, c1.b, c2.r, c2.g, c2.b, normalize);
+        return colorDistance(c1, c2, normalize);
     }
+}
 
-    /**
-     * Compares the pixel starting at `index` in an RGBA buffer with a color, without allocating.
-     * Returns exactly the same value as colorDistance. The alpha channel is ignored
-     * @param data An RGBA pixel buffer (e.g. ImageData.data)
-     * @param index The index of the pixel's red channel (pixel number × 4)
-     * @param color The color to compare with
-     * @param normalize When true returns a value between 0 and 1
-     * @returns A value indicating the distance between the pixel and the color
-     */
-    static colorDistanceAt(data: ArrayLike<number>, index: number, color: Rgb, normalize = false): number {
-        return Color.distance(data[index], data[index + 1], data[index + 2], color.r, color.g, color.b, normalize);
-    }
+// Source: https://stackoverflow.com/questions/9018016/how-to-compare-two-colors-for-similarity-difference
+/**
+ * Compares 2 colors and returns a value indicating the distance between them
+ * @param c1 The first color to compare
+ * @param c2 The second color to compare
+ * @param normalize When true returns a value between 0 and 1
+ * @returns A value indicating the distance between 2 colors
+ */
+export function colorDistance(c1: Rgb, c2: Rgb, normalize = false): number {
+    return distance(c1.r, c1.g, c1.b, c2.r, c2.g, c2.b, normalize);
+}
 
-    private static distance(r1: number, g1: number, b1: number, r2: number, g2: number, b2: number, normalize: boolean): number {
-        const rmean = (r1 + r2) / 2;
-        const r = r1 - r2;
-        const g = g1 - g2;
-        const b = b1 - b2;
-        const res = Math.sqrt((((512 + rmean) * r * r) >> 8) + 4 * g * g + (((767 - rmean) * b * b) >> 8));
-        return normalize ? res / 764.8333151739665 : res;
-    }
+/**
+ * Compares the pixel starting at `index` in an RGBA buffer with a color, without allocating.
+ * Returns exactly the same value as colorDistance. The alpha channel is ignored
+ * @param data An RGBA pixel buffer (e.g. ImageData.data)
+ * @param index The index of the pixel's red channel (pixel number × 4)
+ * @param color The color to compare with
+ * @param normalize When true returns a value between 0 and 1
+ * @returns A value indicating the distance between the pixel and the color
+ */
+export function colorDistanceAt(data: ArrayLike<number>, index: number, color: Rgb, normalize = false): number {
+    return distance(data[index], data[index + 1], data[index + 2], color.r, color.g, color.b, normalize);
+}
+
+function distance(r1: number, g1: number, b1: number, r2: number, g2: number, b2: number, normalize: boolean): number {
+    const rmean = (r1 + r2) / 2;
+    const r = r1 - r2;
+    const g = g1 - g2;
+    const b = b1 - b2;
+    const res = Math.sqrt((((512 + rmean) * r * r) >> 8) + 4 * g * g + (((767 - rmean) * b * b) >> 8));
+    return normalize ? res / 764.8333151739665 : res;
 }
