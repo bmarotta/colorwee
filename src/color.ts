@@ -539,3 +539,27 @@ export function colorDistanceAt(data: ArrayLike<number>, index: number, color: R
     const res = Math.sqrt((((512 + rmean) * r * r) >> 8) + 4 * g * g + (((767 - rmean) * b * b) >> 8));
     return normalize ? res / 764.8333151739665 : res;
 }
+
+/**
+ * Same as colorDistanceAt, but returns the squared distance (skips the square root).
+ * Use it to compare against a threshold: `colorDistanceSquaredAt(data, i, color) <= threshold * threshold`
+ * gives the same answer as `colorDistanceAt(data, i, color) <= threshold`, except when the distance equals
+ * the threshold to floating-point precision. The alpha channel is ignored
+ * @param data An RGBA pixel buffer (e.g. ImageData.data)
+ * @param index The index of the pixel's red channel (pixel number × 4)
+ * @param color The color to compare with
+ * @param normalize When true returns a value between 0 and 1 (the square of the normalized distance)
+ * @returns The squared distance between the pixel and the color
+ */
+export function colorDistanceSquaredAt(data: ArrayLike<number>, index: number, color: Rgb, normalize = false): number {
+    // Repeats the colorDistance formula on purpose, for performance (no extra call in per-pixel loops).
+    // Keep both in sync; the tests check they return identical results.
+    const r1 = data[index];
+    const rmean = (r1 + color.r) / 2;
+    const r = r1 - color.r;
+    const g = data[index + 1] - color.g;
+    const b = data[index + 2] - color.b;
+    const res = (((512 + rmean) * r * r) >> 8) + 4 * g * g + (((767 - rmean) * b * b) >> 8);
+    // 584970 is the squared distance between black and white
+    return normalize ? res / 584970 : res;
+}

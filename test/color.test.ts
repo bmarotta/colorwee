@@ -1,4 +1,4 @@
-import { Color, colorDistance, colorDistanceAt } from "../src/color";
+import { Color, colorDistance, colorDistanceAt, colorDistanceSquaredAt } from "../src/color";
 
 describe("color", () => {
     test("can create an empty color", async () => {
@@ -241,5 +241,39 @@ describe("color", () => {
         const c2 = { r: 129, g: 128, b: 128 };
         expect(Color.colorDistance(c1, c2)).toBe(colorDistance(c1, c2));
         expect(Color.colorDistance(c1, c2, true)).toBe(colorDistance(c1, c2, true));
+    });
+    test("colorDistanceSquaredAt is the square of colorDistanceAt", async () => {
+        const colors = [
+            { r: 0, g: 0, b: 0 },
+            { r: 255, g: 255, b: 255 },
+            { r: 255, g: 0, b: 0 },
+            { r: 0, g: 255, b: 0 },
+            { r: 0, g: 0, b: 255 },
+            { r: 128, g: 128, b: 128 },
+            { r: 129, g: 128, b: 128 },
+            { r: 128, g: 129, b: 128 },
+            { r: 128, g: 128, b: 129 },
+            { r: 10, g: 200, b: 37 }
+        ];
+        const data = new Uint8ClampedArray([9, 9, 9, 9, 0, 0, 0, 0]);
+        for (const c1 of colors) {
+            data.set([c1.r, c1.g, c1.b, 0], 4);
+            for (const c2 of colors) {
+                expect(Math.sqrt(colorDistanceSquaredAt(data, 4, c2))).toBe(colorDistanceAt(data, 4, c2));
+                expect(colorDistanceSquaredAt(data, 4, c2, true)).toBeCloseTo(colorDistanceAt(data, 4, c2, true) ** 2, 12);
+            }
+        }
+        expect(colorDistanceSquaredAt(new Uint8ClampedArray([0, 0, 0, 255]), 0, { r: 255, g: 255, b: 255 }, true)).toBe(1);
+    });
+
+    test("colorDistanceSquaredAt gives the same threshold answers as colorDistanceAt", async () => {
+        const data = new Uint8ClampedArray(4);
+        const color = { r: 250, g: 255, b: 255 };
+        for (const threshold of [0, 3, 10, 50.5, 200]) {
+            for (let v = 0; v < 256; v += 3) {
+                data.set([v, 255 - v, (v * 7) % 256, 255]);
+                expect(colorDistanceSquaredAt(data, 0, color) <= threshold * threshold).toBe(colorDistanceAt(data, 0, color) <= threshold);
+            }
+        }
     });
 });
