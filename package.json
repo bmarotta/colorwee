@@ -1,6 +1,6 @@
 {
   "name": "colorwee",
-  "version": "1.0.9",
+  "version": "1.1.0",
   "description": "A mini package for color conversion not bloated with functions you will never use",
   "main": "./dist/color.js",
   "types": "./dist/color.d.ts",

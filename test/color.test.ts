@@ -1,4 +1,12 @@
-import { Color } from "../src/color";
+import {
+    Color,
+    colorDistance,
+    colorDistanceAt,
+    colorDistanceSquared,
+    colorDistanceSquaredAt,
+    MAX_COLOR_DISTANCE,
+    MAX_COLOR_DISTANCE_SQUARED
+} from "../src/color";
 
 describe("color", () => {
     test("can create an empty color", async () => {
@@ -189,18 +197,100 @@ describe("color", () => {
     });
 
     test("can calculate color distance", async () => {
-        let distance = Color.colorDistance({ r: 0, g: 0, b: 0 }, { r: 0, g: 0, b: 0 }, true);
+        let distance = colorDistance({ r: 0, g: 0, b: 0 }, { r: 0, g: 0, b: 0 }, true);
         expect(distance).toBe(0);
 
-        distance = Color.colorDistance({ r: 0, g: 0, b: 0 }, { r: 255, g: 255, b: 255 }, true);
+        distance = colorDistance({ r: 0, g: 0, b: 0 }, { r: 255, g: 255, b: 255 }, true);
         expect(distance).toBe(1);
 
-        distance = Color.colorDistance({ r: 0, g: 0, b: 0 }, { r: 128, g: 128, b: 128 }, true);
+        distance = colorDistance({ r: 0, g: 0, b: 0 }, { r: 128, g: 128, b: 128 }, true);
         distance = Math.round(distance * 100) / 100;
         expect(distance).toBe(0.5);
 
-        distance = Color.colorDistance({ r: 255, g: 255, b: 255 }, { r: 250, g: 255, b: 255 }, true);
+        distance = colorDistance({ r: 255, g: 255, b: 255 }, { r: 250, g: 255, b: 255 }, true);
         distance = Math.round(distance * 100) / 100;
         expect(distance).toBe(0.01);
+    });
+    test("colorDistanceAt matches colorDistance", async () => {
+        const colors = [
+            { r: 0, g: 0, b: 0 },
+            { r: 255, g: 255, b: 255 },
+            { r: 255, g: 0, b: 0 },
+            { r: 0, g: 255, b: 0 },
+            { r: 0, g: 0, b: 255 },
+            { r: 128, g: 128, b: 128 },
+            { r: 129, g: 128, b: 128 },
+            { r: 128, g: 129, b: 128 },
+            { r: 128, g: 128, b: 129 },
+            { r: 10, g: 200, b: 37 }
+        ];
+        const data = new Uint8ClampedArray(4);
+        for (const c1 of colors) {
+            data.set([c1.r, c1.g, c1.b, 255]);
+            for (const c2 of colors) {
+                for (const normalize of [false, true]) {
+                    expect(colorDistanceAt(data, 0, c2, normalize)).toBe(colorDistance(c1, c2, normalize));
+                }
+            }
+        }
+    });
+
+    test("colorDistanceAt reads the pixel at index and ignores alpha", async () => {
+        const data = new Uint8ClampedArray([0, 0, 0, 255, 250, 255, 255, 0, 1, 2, 3, 4]);
+        const white = { r: 255, g: 255, b: 255 };
+        expect(colorDistanceAt(data, 4, white, true)).toBe(colorDistance({ r: 250, g: 255, b: 255 }, white, true));
+        expect(colorDistanceAt(data, 0, white, true)).toBe(1);
+        data[7] = 255;
+        expect(colorDistanceAt(data, 4, white)).toBe(colorDistance({ r: 250, g: 255, b: 255 }, white));
+        expect(colorDistanceAt(data, 8, { r: 1, g: 2, b: 3 })).toBe(0);
+    });
+    test("deprecated static colorDistance matches colorDistance", async () => {
+        const c1 = { r: 10, g: 200, b: 37 };
+        const c2 = { r: 129, g: 128, b: 128 };
+        expect(Color.colorDistance(c1, c2)).toBe(colorDistance(c1, c2));
+        expect(Color.colorDistance(c1, c2, true)).toBe(colorDistance(c1, c2, true));
+    });
+    test("colorDistanceSquared(At) is the square of colorDistance(At)", async () => {
+        const colors = [
+            { r: 0, g: 0, b: 0 },
+            { r: 255, g: 255, b: 255 },
+            { r: 255, g: 0, b: 0 },
+            { r: 0, g: 255, b: 0 },
+            { r: 0, g: 0, b: 255 },
+            { r: 128, g: 128, b: 128 },
+            { r: 129, g: 128, b: 128 },
+            { r: 128, g: 129, b: 128 },
+            { r: 128, g: 128, b: 129 },
+            { r: 10, g: 200, b: 37 }
+        ];
+        const data = new Uint8ClampedArray([9, 9, 9, 9, 0, 0, 0, 0]);
+        for (const c1 of colors) {
+            data.set([c1.r, c1.g, c1.b, 0], 4);
+            for (const c2 of colors) {
+                expect(Math.sqrt(colorDistanceSquaredAt(data, 4, c2))).toBe(colorDistanceAt(data, 4, c2));
+                expect(colorDistanceSquaredAt(data, 4, c2, true)).toBeCloseTo(colorDistanceAt(data, 4, c2, true) ** 2, 12);
+                expect(colorDistanceSquared(c1, c2)).toBe(colorDistanceSquaredAt(data, 4, c2));
+                expect(colorDistanceSquared(c1, c2, true)).toBe(colorDistanceSquaredAt(data, 4, c2, true));
+            }
+        }
+        expect(colorDistanceSquaredAt(new Uint8ClampedArray([0, 0, 0, 255]), 0, { r: 255, g: 255, b: 255 }, true)).toBe(1);
+    });
+
+    test("colorDistanceSquaredAt gives the same threshold answers as colorDistanceAt", async () => {
+        const data = new Uint8ClampedArray(4);
+        const color = { r: 250, g: 255, b: 255 };
+        for (const threshold of [0, 3, 10, 50.5, 200]) {
+            for (let v = 0; v < 256; v += 3) {
+                data.set([v, 255 - v, (v * 7) % 256, 255]);
+                expect(colorDistanceSquaredAt(data, 0, color) <= threshold * threshold).toBe(colorDistanceAt(data, 0, color) <= threshold);
+            }
+        }
+    });
+    test("max distance constants match black and white", async () => {
+        const black = { r: 0, g: 0, b: 0 };
+        const white = { r: 255, g: 255, b: 255 };
+        expect(colorDistance(black, white)).toBe(MAX_COLOR_DISTANCE);
+        expect(colorDistanceSquared(black, white)).toBe(MAX_COLOR_DISTANCE_SQUARED);
+        expect(MAX_COLOR_DISTANCE * MAX_COLOR_DISTANCE).toBe(MAX_COLOR_DISTANCE_SQUARED);
     });
 });

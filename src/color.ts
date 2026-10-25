@@ -26,6 +26,16 @@ export interface Rgba extends Rgb {
 
 const HSLA_REGEX = /^hsla?\(\s*(\d{1,3}(?:\.\d+)?%?)\s*,\s*(\d{1,3}(?:\.\d+)?%)\s*,\s*(\d{1,3}(?:\.\d+)?%)(?:,\s*(0?\.?\d+%?))?\)$/;
 const RGBA_REGEX = /^rgba?\((\d{1,3}(?:\.\d+)?%?),\s*(\d{1,3}(?:\.\d+)?%?),\s*(\d{1,3}(?:\.\d+)?%?)(?:,\s*(0?\.?\d+%?))?\)$/;
+/**
+ * The largest value colorDistance can return: the distance between black and white
+ */
+export const MAX_COLOR_DISTANCE = 764.8333151739665;
+
+/**
+ * The largest value colorDistanceSquared can return: the squared distance between black and white
+ */
+export const MAX_COLOR_DISTANCE_SQUARED = 584970;
+
 export class Color {
     /**
      * The red color component. Stored as a number from 0 to 255
@@ -487,20 +497,99 @@ export class Color {
         return this.toRgbaString();
     }
 
-    // Source: https://stackoverflow.com/questions/9018016/how-to-compare-two-colors-for-similarity-difference
     /**
      * Compares 2 colors and returns a value indicating the distance between them
+     * @deprecated Use the exported colorDistance function instead
      * @param c1 The first color to compare
      * @param c2 The second color to compare
      * @param normalize When true returns a value between 0 and 1
      * @returns A value indicating the distance between 2 colors
      */
     static colorDistance(c1: Rgb, c2: Rgb, normalize = false): number {
-        const rmean = (c1.r + c2.r) / 2;
-        const r = c1.r - c2.r;
-        const g = c1.g - c2.g;
-        const b = c1.b - c2.b;
-        const res = Math.sqrt((((512 + rmean) * r * r) >> 8) + 4 * g * g + (((767 - rmean) * b * b) >> 8));
-        return normalize ? res / 764.8333151739665 : res;
+        return colorDistance(c1, c2, normalize);
     }
+}
+
+// Source: https://stackoverflow.com/questions/9018016/how-to-compare-two-colors-for-similarity-difference
+/**
+ * Compares 2 colors and returns a value indicating the distance between them
+ * @param c1 The first color to compare
+ * @param c2 The second color to compare
+ * @param normalize When true returns a value between 0 and 1
+ * @returns A value indicating the distance between 2 colors
+ */
+export function colorDistance(c1: Rgb, c2: Rgb, normalize = false): number {
+    // The formula is repeated in the other colorDistance* functions on purpose, for performance
+    // (no extra call in per-pixel loops). Keep them in sync; the tests check they return matching results.
+    const rmean = (c1.r + c2.r) / 2;
+    const r = c1.r - c2.r;
+    const g = c1.g - c2.g;
+    const b = c1.b - c2.b;
+    const res = Math.sqrt((((512 + rmean) * r * r) >> 8) + 4 * g * g + (((767 - rmean) * b * b) >> 8));
+    return normalize ? res / MAX_COLOR_DISTANCE : res;
+}
+
+/**
+ * Compares the pixel starting at `index` in an RGBA buffer with a color, without allocating.
+ * Returns exactly the same value as colorDistance. The alpha channel is ignored
+ * @param data An RGBA pixel buffer (e.g. ImageData.data)
+ * @param index The index of the pixel's red channel (pixel number × 4)
+ * @param color The color to compare with
+ * @param normalize When true returns a value between 0 and 1
+ * @returns A value indicating the distance between the pixel and the color
+ */
+export function colorDistanceAt(data: ArrayLike<number>, index: number, color: Rgb, normalize = false): number {
+    // Repeats the colorDistance formula on purpose, for performance (no extra call in per-pixel loops).
+    // Keep them in sync; the tests check they return matching results.
+    const r1 = data[index];
+    const rmean = (r1 + color.r) / 2;
+    const r = r1 - color.r;
+    const g = data[index + 1] - color.g;
+    const b = data[index + 2] - color.b;
+    const res = Math.sqrt((((512 + rmean) * r * r) >> 8) + 4 * g * g + (((767 - rmean) * b * b) >> 8));
+    return normalize ? res / MAX_COLOR_DISTANCE : res;
+}
+
+/**
+ * Same as colorDistance, but returns the squared distance (skips the square root).
+ * Use it to compare against a threshold: `colorDistanceSquared(c1, c2) <= threshold * threshold`
+ * gives the same answer as `colorDistance(c1, c2) <= threshold`, except when the distance equals
+ * the threshold to floating-point precision
+ * @param c1 The first color to compare
+ * @param c2 The second color to compare
+ * @param normalize When true returns a value between 0 and 1 (the square of the normalized distance)
+ * @returns The squared distance between 2 colors
+ */
+export function colorDistanceSquared(c1: Rgb, c2: Rgb, normalize = false): number {
+    // Repeats the colorDistance formula on purpose, for performance (no extra call in per-pixel loops).
+    // Keep them in sync; the tests check they return matching results.
+    const rmean = (c1.r + c2.r) / 2;
+    const r = c1.r - c2.r;
+    const g = c1.g - c2.g;
+    const b = c1.b - c2.b;
+    const res = (((512 + rmean) * r * r) >> 8) + 4 * g * g + (((767 - rmean) * b * b) >> 8);
+    return normalize ? res / MAX_COLOR_DISTANCE_SQUARED : res;
+}
+
+/**
+ * Same as colorDistanceAt, but returns the squared distance (skips the square root).
+ * Use it to compare against a threshold: `colorDistanceSquaredAt(data, i, color) <= threshold * threshold`
+ * gives the same answer as `colorDistanceAt(data, i, color) <= threshold`, except when the distance equals
+ * the threshold to floating-point precision. The alpha channel is ignored
+ * @param data An RGBA pixel buffer (e.g. ImageData.data)
+ * @param index The index of the pixel's red channel (pixel number × 4)
+ * @param color The color to compare with
+ * @param normalize When true returns a value between 0 and 1 (the square of the normalized distance)
+ * @returns The squared distance between the pixel and the color
+ */
+export function colorDistanceSquaredAt(data: ArrayLike<number>, index: number, color: Rgb, normalize = false): number {
+    // Repeats the colorDistance formula on purpose, for performance (no extra call in per-pixel loops).
+    // Keep them in sync; the tests check they return matching results.
+    const r1 = data[index];
+    const rmean = (r1 + color.r) / 2;
+    const r = r1 - color.r;
+    const g = data[index + 1] - color.g;
+    const b = data[index + 2] - color.b;
+    const res = (((512 + rmean) * r * r) >> 8) + 4 * g * g + (((767 - rmean) * b * b) >> 8);
+    return normalize ? res / MAX_COLOR_DISTANCE_SQUARED : res;
 }
