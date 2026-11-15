@@ -166,10 +166,22 @@ describe("color", () => {
 
         const c = new Color("#ffffff");
         c.red = 128;
-        expect(c.toHslString()).toBe("hsl(180,100%,75%)");
+        expect(c.toHslString()).toBe("hsl(180,100%,75.1%)");
 
         expect(new Color(new Color("#ff0000").toHslString()).toString()).toBe("#ff0000");
         expect(new Color(new Color("#ffffff").toHslaString()).toString()).toBe("#ffffff");
+    });
+
+    test("hsl strings round-trip rgb colors exactly", async () => {
+        expect(new Color("rgb(123,12,1)").toHslString()).toBe("hsl(5.4,98.4%,24.3%)");
+        for (let r = 0; r < 256; r += 5) {
+            for (let g = 0; g < 256; g += 7) {
+                for (let b = 0; b < 256; b += 11) {
+                    const c = new Color({ r, g, b });
+                    expect(new Color(c.toHslString()).rgb).toEqual({ r, g, b });
+                }
+            }
+        }
     });
 
     test("can get and set (values and string)", async () => {

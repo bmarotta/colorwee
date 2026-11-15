@@ -36,8 +36,8 @@ export const MAX_COLOR_DISTANCE = 764.8333151739665;
  */
 export const MAX_COLOR_DISTANCE_SQUARED = 584970;
 
-// Two significant digits without toPrecision's exponential notation (100 -> "1.0e+2")
-const formatPercentage = (value: number): string => String(Number(value.toPrecision(2)));
+// One decimal, dropping a trailing ".0". Enough for hsl strings to round-trip every 8-bit rgb color
+const formatHslComponent = (value: number): string => String(Number(value.toFixed(1)));
 
 export class Color {
     /**
@@ -256,16 +256,19 @@ export class Color {
      * @returns The color as an hsl string
      */
     toHslString(): string {
-        const hsl = this.toHsla();
-        return `hsl(${hsl.h.toFixed(0)},${formatPercentage(hsl.s)}%,${formatPercentage(hsl.l)}%)`;
+        return `hsl(${this.formatHslComponents()})`;
     }
     /**
      * Converts the color to an CSS hsla string
      * @returns The color as an hsla string
      */
     toHslaString(): string {
-        const hsl = this.toHsla();
-        return `hsla(${hsl.h.toFixed(0)},${formatPercentage(hsl.s)}%,${formatPercentage(hsl.l)}%,${this.a})`;
+        return `hsla(${this.formatHslComponents()},${this.a})`;
+    }
+
+    private formatHslComponents(): string {
+        const hsl = Color.Convertor.rgbToHsl(<Rgb>(<unknown>this), 1);
+        return `${formatHslComponent(hsl.h)},${formatHslComponent(hsl.s)}%,${formatHslComponent(hsl.l)}%`;
     }
 
     private parseHsla(str: string) {
@@ -274,7 +277,8 @@ export class Color {
             throw new Error(`Wrong hsl encoding. ${parts ? parts.length : 0} parts parsed. Expected 4 or 5: ${JSON.stringify(parts)}`);
         }
         const rgb = Color.Convertor.hslToRgb({
-            h: Color.Convertor.numberOrPercentage(parts[1], 360, true),
+            // Plain hues keep their decimals so toHslString() round-trips; percentage hues stay rounded
+            h: parts[1].endsWith("%") ? Color.Convertor.numberOrPercentage(parts[1], 360, true) : parseFloat(parts[1]),
             s: parseFloat(parts[2]),
             l: parseFloat(parts[3])
         });
@@ -390,8 +394,9 @@ export class Color {
         /**
          * Converts an rgb color to hsl
          * @param rgb The color to be converted
+         * @param hueDecimals Number of decimals to keep in the hue. Defaults to 0 (integer hue)
          */
-        rgbToHsl(rgb: Rgb): HSL {
+        rgbToHsl(rgb: Rgb, hueDecimals = 0): HSL {
             //
             const res: HSL = { h: 0, s: 0, l: 0 };
             const r = Math.min(1, Math.max(0, rgb.r / 255)),
@@ -419,7 +424,8 @@ export class Color {
                 res.h /= 6;
             }
             // Converts to the expected range
-            res.h = Math.round(res.h * 360);
+            const hueFactor = 10 ** hueDecimals;
+            res.h = Math.round(res.h * 360 * hueFactor) / hueFactor;
             res.s = Math.round(res.s * 100000) / 1000;
             res.l = Math.round(res.l * 100000) / 1000;
             return res;
