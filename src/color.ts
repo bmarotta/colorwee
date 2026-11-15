@@ -36,6 +36,9 @@ export const MAX_COLOR_DISTANCE = 764.8333151739665;
  */
 export const MAX_COLOR_DISTANCE_SQUARED = 584970;
 
+// Two significant digits without toPrecision's exponential notation (100 -> "1.0e+2")
+const formatPercentage = (value: number): string => String(Number(value.toPrecision(2)));
+
 export class Color {
     /**
      * The red color component. Stored as a number from 0 to 255
@@ -254,7 +257,7 @@ export class Color {
      */
     toHslString(): string {
         const hsl = this.toHsla();
-        return `hsl(${hsl.h.toFixed(0)},${hsl.s.toPrecision(2)}%,${hsl.l.toPrecision(2)}%)`;
+        return `hsl(${hsl.h.toFixed(0)},${formatPercentage(hsl.s)}%,${formatPercentage(hsl.l)}%)`;
     }
     /**
      * Converts the color to an CSS hsla string
@@ -262,7 +265,7 @@ export class Color {
      */
     toHslaString(): string {
         const hsl = this.toHsla();
-        return `hsla(${hsl.h.toFixed(0)},${hsl.s.toPrecision(2)}%,${hsl.l.toPrecision(2)}%,${this.a})`;
+        return `hsla(${hsl.h.toFixed(0)},${formatPercentage(hsl.s)}%,${formatPercentage(hsl.l)}%,${this.a})`;
     }
 
     private parseHsla(str: string) {

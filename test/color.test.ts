@@ -159,6 +159,19 @@ describe("color", () => {
         expect(hsla).toEqual({ h: 120, s: 56, l: 50.98, a: 1 });
     });
 
+    test("formats 100% hsl components without exponential notation", async () => {
+        expect(new Color("#ff0000").toHslString()).toBe("hsl(0,100%,50%)");
+        expect(new Color("#ff0000").toHslaString()).toBe("hsla(0,100%,50%,1)");
+        expect(new Color("#ffffff").toHslString()).toBe("hsl(0,0%,100%)");
+
+        const c = new Color("#ffffff");
+        c.red = 128;
+        expect(c.toHslString()).toBe("hsl(180,100%,75%)");
+
+        expect(new Color(new Color("#ff0000").toHslString()).toString()).toBe("#ff0000");
+        expect(new Color(new Color("#ffffff").toHslaString()).toString()).toBe("#ffffff");
+    });
+
     test("can get and set (values and string)", async () => {
         const c = new Color();
         c.rgb = { r: 255, g: 255, b: 255 };
