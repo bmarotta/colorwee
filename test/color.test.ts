@@ -159,6 +159,31 @@ describe("color", () => {
         expect(hsla).toEqual({ h: 120, s: 56, l: 50.98, a: 1 });
     });
 
+    test("formats 100% hsl components without exponential notation", async () => {
+        expect(new Color("#ff0000").toHslString()).toBe("hsl(0,100%,50%)");
+        expect(new Color("#ff0000").toHslaString()).toBe("hsla(0,100%,50%,1)");
+        expect(new Color("#ffffff").toHslString()).toBe("hsl(0,0%,100%)");
+
+        const c = new Color("#ffffff");
+        c.red = 128;
+        expect(c.toHslString()).toBe("hsl(180,100%,75.1%)");
+
+        expect(new Color(new Color("#ff0000").toHslString()).toString()).toBe("#ff0000");
+        expect(new Color(new Color("#ffffff").toHslaString()).toString()).toBe("#ffffff");
+    });
+
+    test("hsl strings round-trip rgb colors exactly", async () => {
+        expect(new Color("rgb(123,12,1)").toHslString()).toBe("hsl(5.4,98.4%,24.3%)");
+        for (let r = 0; r < 256; r += 5) {
+            for (let g = 0; g < 256; g += 7) {
+                for (let b = 0; b < 256; b += 11) {
+                    const c = new Color({ r, g, b });
+                    expect(new Color(c.toHslString()).rgb).toEqual({ r, g, b });
+                }
+            }
+        }
+    });
+
     test("can get and set (values and string)", async () => {
         const c = new Color();
         c.rgb = { r: 255, g: 255, b: 255 };
